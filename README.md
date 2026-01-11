@@ -1,6 +1,6 @@
 # Study Locator PWA
 
-A modern Progressive Web App (PWA) to discover peaceful study locations where you can focus in silence.
+A modern Progressive Web App (PWA) to discover peaceful study locations where you can focus in silence. Features gamification, QR code check-ins, and an interactive map.
 
 ## 📱 Testing on Your Phone (from Localhost)
 
@@ -8,35 +8,23 @@ A modern Progressive Web App (PWA) to discover peaceful study locations where yo
 
 1. **Make sure your phone and laptop are on the same WiFi network**
 
-2. **Find your laptop's IP address:**
-
-   - **Windows**: Open CMD and type `ipconfig` - look for "IPv4 Address" (e.g., `192.168.1.100`)
-   - **Mac**: System Preferences → Network → Your WiFi → IP Address
-
-3. **Start the dev server:**
+2. **Start the dev server:**
 
    ```bash
    npm run dev
    ```
 
-4. **Open the app on your phone:**
+   This will start a secure server (HTTPS) at `https://YOUR_LAPTOP_IP:5173`.
+
+3. **Open the app on your phone:**
 
    - Open your phone's browser
-   - Go to: `http://YOUR_LAPTOP_IP:5173` (e.g., `http://192.168.1.100:5173`)
-   - For QR scanning to work, you may need HTTPS. Try using a tunneling service like `ngrok`:
-     ```bash
-     npx ngrok http 5173
-     ```
-     Then use the `https://` URL it provides on your phone.
+   - Go to the URL shown in the terminal (e.g., `https://192.168.1.100:5173`)
+   - **Note:** You will likely see a "Your connection is not private" warning because we are using a self-signed certificate for local development. This is normal. Click "Advanced" -> "Proceed to..." to access the app.
+   - 📸 **Camera access:** HTTPS is required for QR scanning to work on mobile devices.
 
-5. **Install as PWA (optional):**
-   - On your phone's browser, tap "Add to Home Screen" to install the app
-
-### Troubleshooting:
-
-- **Can't connect?** Check your firewall settings on your laptop
-- **Camera not working?** QR scanning requires HTTPS on mobile. Use ngrok or deploy to a hosting service
-- **Slow?** Make sure both devices are on the same WiFi
+4. **Install as PWA (optional):**
+   - On your phone's browser, tap "Add to Home Screen" to install the app for a native-like experience.
 
 ---
 
@@ -70,10 +58,13 @@ A modern Progressive Web App (PWA) to discover peaceful study locations where yo
 
 - 🗺️ **Interactive Map** - Real-time Leaflet map showing study locations
 - 📱 **Responsive Design** - Works seamlessly on mobile, tablet, and desktop
-- 🔍 **Location Details** - Comprehensive information about each study space
+- 🔍 **Location Details** - Comprehensive information about each study space including quietness levels and amenities
+- 🎮 **Gamification** - Earn badges, XP, and level up by checking into study spots
+- 📷 **In-App QR Scanner** - Verify your presence and unlock rewards by scanning codes
+- 📊 **Dashboard** - Track your study habits, visits, and progress
 - ⚡ **Fast Data Loading** - TanStack Query for efficient API data management
-- 🎨 **Modern UI** - Clean design with Tailwind CSS
-- 📴 **PWA Support** - Works offline with service worker caching
+- ✨ **Fluid Animations** - Powered by Framer Motion for a polished user experience
+- 📴 **PWA Support** - Installable on devices with offline capabilities
 - 🚀 **Built with React** - Extensible component architecture
 
 ## Tech Stack
@@ -81,9 +72,10 @@ A modern Progressive Web App (PWA) to discover peaceful study locations where yo
 - **Frontend Framework**: React 18
 - **Build Tool**: Vite
 - **Styling**: Tailwind CSS
-- **State Management**: TanStack Query v5
-- **Maps**: Leaflet & React Leaflet
-- **HTTP Client**: Axios
+- **Animations**: Framer Motion
+- **Maps**: Leaflet & React Leaflet (with Routing Machine)
+- **State Management**: TanStack Query v5 & React Context
+- **QR Scanning**: html5-qrcode
 - **Language**: TypeScript
 - **PWA**: Vite PWA Plugin
 
@@ -127,9 +119,10 @@ npm run preview
 
 ```
 src/
-├── components/        # React components (Map, LocationCard, etc.)
+├── components/        # React components (Dashboard, Map, Profile, QRScanner, etc.)
+├── contexts/         # React Contexts (Auth, Theme, etc.)
 ├── hooks/            # Custom React hooks (useLocations)
-├── services/         # API service layer
+├── services/         # API service layer (checkIn, gamification, location, review)
 ├── types/            # TypeScript type definitions
 ├── App.tsx           # Main application component
 ├── main.tsx          # Application entry point
@@ -137,12 +130,6 @@ src/
 
 public/
 └── manifest.json     # PWA manifest file
-
-qrcode/               # Standalone QR Check-in System
-├── css/             # Styles for QR pages
-├── js/              # Logic for check-in demo
-├── index.html       # Location selection interface
-└── qr-checkin.html  # Check-in confirmation interface
 ```
 
 ## API Integration
