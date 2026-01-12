@@ -174,24 +174,20 @@ function App() {
                   onNavigate={startNavigation}
                   isNavigating={!!navDestination}
                   onCancelNavigation={() => setNavDestination(null)}
+                  onClose={() => setSelectedLocation(undefined)}
                 />
               </div>
 
               {selectedLocation && (
                 <div className="lg:hidden fixed left-2 right-2 bottom-20 bg-white dark:bg-gray-800 rounded-2xl shadow-xl z-[2000] max-h-[50vh] overflow-y-auto border border-gray-200 dark:border-gray-700 transition-colors">
                   <div className="relative">
-                    <button
-                      onClick={() => setSelectedLocation(undefined)}
-                      className="absolute top-3 right-3 p-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full text-gray-500 dark:text-gray-400 z-10"
-                    >
-                      ✕
-                    </button>
                     <DetailsPanel
                       location={selectedLocation}
                       isLoading={isLoading}
                       onNavigate={startNavigation}
                       isNavigating={!!navDestination}
                       onCancelNavigation={() => setNavDestination(null)}
+                      onClose={() => setSelectedLocation(undefined)}
                     />
                   </div>
                 </div>

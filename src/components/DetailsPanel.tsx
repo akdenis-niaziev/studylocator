@@ -4,6 +4,7 @@ import { reviewService } from "../services/reviewService";
 import { Review } from "../types/review";
 import { useAuth } from "../contexts/AuthContext";
 import { motion, AnimatePresence, Variants } from "framer-motion";
+import { CloseButton } from "./CloseButton";
 
 interface DetailsPanelProps {
   location?: StudyLocation;
@@ -11,6 +12,7 @@ interface DetailsPanelProps {
   onNavigate?: (mode: "car" | "bike" | "foot") => void;
   isNavigating?: boolean;
   onCancelNavigation?: () => void;
+  onClose?: () => void;
 }
 
 export const DetailsPanel: React.FC<DetailsPanelProps> = ({
@@ -19,6 +21,7 @@ export const DetailsPanel: React.FC<DetailsPanelProps> = ({
   onNavigate,
   isNavigating,
   onCancelNavigation,
+  onClose,
 }) => {
   const { userId } = useAuth();
   const [showQRCode, setShowQRCode] = useState(false);
@@ -125,7 +128,12 @@ export const DetailsPanel: React.FC<DetailsPanelProps> = ({
         variants={itemVariants}
         className="bg-blue-600 dark:bg-blue-700 text-white p-4 sm:p-6 sticky top-0 z-10 shadow-md"
       >
-        <h2 className="text-xl sm:text-2xl font-bold mb-2">{location.name}</h2>
+        <div className="flex justify-between items-start mb-2 gap-4">
+          <h2 className="text-xl sm:text-2xl font-bold">{location.name}</h2>
+          {onClose && (
+            <CloseButton onClick={onClose} className="shrink-0 -mt-1 -mr-2" />
+          )}
+        </div>
         <div className="flex flex-wrap gap-2">
           {location.quietnessLevel && (
             <span className="inline-block px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs sm:text-sm font-medium">
