@@ -98,7 +98,9 @@ export const Map: React.FC<MapProps> = ({
               <h3>{location.name}</h3>
               {location.description && <p>{location.description}</p>}
               {location.address && (
-                <p className="text-gray-500">{location.address}</p>
+                <p className="text-gray-500 dark:text-gray-400">
+                  {location.address}
+                </p>
               )}
             </div>
           </Popup>
