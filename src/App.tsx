@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useLocations } from "./hooks/useLocations";
 import { useAuth } from "./contexts/AuthContext";
 import { useTheme } from "./contexts/ThemeContext";
@@ -9,6 +9,7 @@ import { StudyLocation } from "./types/location";
 import { QRScanner } from "./components/QRScanner";
 import { Dashboard } from "./components/Dashboard";
 import { Profile } from "./components/Profile";
+import { DetailBottomSheet } from "./components/BottomSheet";
 
 type View = "explore" | "scan" | "profile" | "admin";
 
@@ -29,14 +30,16 @@ function App() {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Navigation State
-  const [userLocation, setUserLocation] = useState<{
-    lat: number;
-    lng: number;
-  } | null>(null);
   const [navDestination, setNavDestination] = useState<StudyLocation | null>(
     null
   );
   const [travelMode, setTravelMode] = useState<"car" | "bike" | "foot">("foot");
+
+  // Memoize userLocation updates to prevent unnecessary re-renders
+  const [userLocation, setUserLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
 
   useEffect(() => {
     if ("serviceWorker" in navigator) {
@@ -50,13 +53,25 @@ function App() {
     };
   }, []);
 
-  const fetchUserLocation = () => {
+  const fetchUserLocation = useCallback(() => {
     if ("geolocation" in navigator) {
       return navigator.geolocation.watchPosition(
         (position) => {
-          setUserLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
+          const newLat = position.coords.latitude;
+          const newLng = position.coords.longitude;
+
+          // Only update if location changed significantly (more than ~10 meters)
+          setUserLocation((prev) => {
+            if (!prev) return { lat: newLat, lng: newLng };
+
+            const latDiff = Math.abs(prev.lat - newLat);
+            const lngDiff = Math.abs(prev.lng - newLng);
+
+            // ~0.0001 degrees is roughly 10 meters
+            if (latDiff > 0.0001 || lngDiff > 0.0001) {
+              return { lat: newLat, lng: newLng };
+            }
+            return prev;
           });
         },
         (error) => {
@@ -64,12 +79,12 @@ function App() {
         },
         {
           enableHighAccuracy: true,
-          maximumAge: 10000,
-          timeout: 5000,
+          maximumAge: 30000, // Cache location for 30 seconds
+          timeout: 10000,
         }
       );
     }
-  };
+  }, []);
 
   const startNavigation = (mode: "car" | "bike" | "foot") => {
     if (!selectedLocation) return;
@@ -178,20 +193,20 @@ function App() {
                 />
               </div>
 
-              {selectedLocation && (
-                <div className="lg:hidden fixed left-2 right-2 bottom-20 bg-white dark:bg-gray-800 rounded-2xl shadow-xl z-[2000] max-h-[50vh] overflow-y-auto border border-gray-200 dark:border-gray-700 transition-colors">
-                  <div className="relative">
-                    <DetailsPanel
-                      location={selectedLocation}
-                      isLoading={isLoading}
-                      onNavigate={startNavigation}
-                      isNavigating={!!navDestination}
-                      onCancelNavigation={() => setNavDestination(null)}
-                      onClose={() => setSelectedLocation(undefined)}
-                    />
-                  </div>
-                </div>
-              )}
+              {/* Mobile Bottom Sheet for Details */}
+              <DetailBottomSheet
+                isOpen={!!selectedLocation}
+                onClose={() => setSelectedLocation(undefined)}
+              >
+                <DetailsPanel
+                  location={selectedLocation}
+                  isLoading={isLoading}
+                  onNavigate={startNavigation}
+                  isNavigating={!!navDestination}
+                  onCancelNavigation={() => setNavDestination(null)}
+                  onClose={() => setSelectedLocation(undefined)}
+                />
+              </DetailBottomSheet>
             </div>
           </div>
         );

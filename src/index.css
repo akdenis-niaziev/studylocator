@@ -113,6 +113,27 @@ a {
   background: transparent !important;
 }
 
+/* Bottom Sheet Styles */
+.bottom-sheet-backdrop {
+  @apply fixed inset-0 bg-black/30 z-[1999] transition-opacity;
+}
+
+/* Prevent body scroll when bottom sheet is open */
+.bottom-sheet-open {
+  overflow: hidden;
+}
+
+/* Better touch scrolling for bottom sheet content */
+.bottom-sheet-content {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Ensure routing machine markers don't override our custom markers */
+.leaflet-marker-icon.leaflet-routing-icon {
+  display: none !important;
+}
+
 @media (max-width: 768px) {
   input,
   select,
